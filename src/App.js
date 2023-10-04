@@ -2,40 +2,33 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import Header from './Header';
 import AddItem from './AddItem';
+import SearchItem from './SearchItem';
 import Content from './Content';
 import Footer from './Footer';
-import ItemLists from './ItemLists';
+import LineItem from './LineItem';
+import apiRequest from './apiRequest';
+import FilterDropdown from './FilterDropdown';
 
 function App() {
-  // State for items
+  const API_URL = 'http://localhost:3500/items';
   const [items, setItems] = useState([]);
-  
-  // State for the input value in AddItem
   const [newItem, setNewItem] = useState('');
-
-  // State for the search input
   const [search, setSearch] = useState('');
-
-  // State for error handling
   const [fetchError, setFetchError] = useState(null);
+  const [isLoading, setisLoading] = useState(true);
+  const [filterValue, setFilterValue] = useState('all'); 
 
-  // State for loading indicator
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Effect to fetch initial items from API
   useEffect(() => {
-    const API_URL = "http://localhost:3500/items";
-    
     const fetchItems = async () => {
       try {
         const response = await fetch(API_URL);
-        if (!response.ok) throw Error("Data not received");
+        if (!response.ok) throw Error('Data not received');
         const listItems = await response.json();
         setItems(listItems);
       } catch (err) {
         setFetchError(err.message);
       } finally {
-        setIsLoading(false);
+        setisLoading(false);
       }
     };
 
@@ -44,10 +37,9 @@ function App() {
     }, 2000);
   }, []);
 
-  // Function to handle item addition
-  const addItem = async (item) => {
+  const addItem = async (item, dueDate) => {
     const id = items.length ? items[items.length - 1].id + 1 : 1;
-    const myNewItem = { id, ...item };
+    const myNewItem = { id, checked: false, item, dueDate };
     const listItems = [...items, myNewItem];
     setItems(listItems);
 
@@ -59,72 +51,78 @@ function App() {
       body: JSON.stringify(myNewItem),
     };
 
-    try {
-      const response = await fetch("http://localhost:3500/items", postOptions);
-      if (!response.ok) throw Error("Error posting item");
-    } catch (err) {
-      setFetchError(err.message);
-    }
+    const result = await apiRequest(API_URL, postOptions);
+    if (result) setFetchError(result);
   };
 
-  // Function to handle checking/unchecking items
   const handleCheck = async (id) => {
-    const updatedItems = items.map((item) =>
+    const listItems = items.map((item) =>
       item.id === id ? { ...item, checked: !item.checked } : item
     );
-    setItems(updatedItems);
+    setItems(listItems);
 
-    const updatedItem = updatedItems.find((item) => item.id === id);
+    const myItem = listItems.filter((item) => item.id === id);
+
     const updateOptions = {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ checked: updatedItem.checked }),
+      body: JSON.stringify({ checked: myItem[0].checked }),
     };
 
-    try {
-      const response = await fetch(
-        `http://localhost:3500/items/${id}`,
-        updateOptions
-      );
-      if (!response.ok) throw Error("Error updating item");
-    } catch (err) {
-      setFetchError(err.message);
-    }
+    const result = await apiRequest(API_URL + `/${id}`, updateOptions);
+
+    if (result) setFetchError(result);
   };
 
-  // Function to handle item deletion
   const handleDelete = async (id) => {
-    const updatedItems = items.filter((item) => item.id !== id);
-    setItems(updatedItems);
+    const listItems = items.filter((item) => item.id !== id);
+    setItems(listItems);
 
     const deleteOptions = {
       method: 'DELETE',
     };
 
-    try {
-      const response = await fetch(
-        `http://localhost:3500/items/${id}`,
-        deleteOptions
-      );
-      if (!response.ok) throw Error("Error deleting item");
-    } catch (err) {
-      setFetchError(err.message);
-    }
+    const result = await apiRequest(API_URL + `/${id}`, deleteOptions);
+    if (result) setFetchError(result);
   };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!newItem) return;
+    addItem(newItem);
+    setNewItem('');
+  };
+
+  const filteredItems = items.filter(item => {
+    if (filterValue === 'completed') {
+      return item.checked;
+    } else if (filterValue === 'not-completed') {
+      return !item.checked;
+    } else {
+      return true; // Show all tasks when 'all' is selected
+    }
+  });
+  
 
   return (
     <div className="App">
       <Header title="To Do List" />
-      <AddItem onAdd={addItem} />
-      <Content
-        items={items.filter((item) =>
-          item.item.toLowerCase().includes(search.toLowerCase())
+      <AddItem newItem={newItem} setNewItem={setNewItem} onAdd={addItem} />
+      <SearchItem search={search} setSearch={setSearch} />
+      <FilterDropdown filterValue={filterValue} setFilterValue={setFilterValue} />
+      <main>
+        {isLoading && <p>Loading items..</p>}
+        {fetchError && <p>`Error: {fetchError}`</p>}
+        {!isLoading && !fetchError && (
+          <Content
+          items={filteredItems} // Pass filteredItems to the Content component
+          handleCheck={handleCheck}
+          handleDelete={handleDelete}
+        />
         )}
-        handleCheck={handleCheck}
-        handleDelete={handleDelete}
-      />
+      </main>
       <Footer length={items.length} />
     </div>
   );

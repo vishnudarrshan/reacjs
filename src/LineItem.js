@@ -2,11 +2,7 @@ import React from 'react';
 import { FaTrashAlt } from 'react-icons/fa';
 
 const LineItem = ({ item, handleCheck, handleDelete }) => {
-  // Function to check if due date is today
-  const isDueDateToday = () => {
-    const today = new Date().toISOString().split('T')[0];
-    return item.dueDate === today;
-  };
+  const isDueToday = item.dueDate === getCurrentDate();
 
   return (
     <li className="item" key={item.id}>
@@ -18,23 +14,19 @@ const LineItem = ({ item, handleCheck, handleDelete }) => {
       <label
         style={
           item.checked
-            ? { textDecoration: 'line-through' }
-            : isDueDateToday()
-            ? { color: 'red' }
-            : null
+            ? { textDecoration: 'line-through', fontSize: '1.2rem' }
+            : { fontSize: '1.2rem' }
         }
         onDoubleClick={() => handleCheck(item.id)}
       >
         {item.item}
-        {item.dueDate && (
-          <span
-            className="dueDate"
-            style={isDueDateToday() ? { color: 'red' } : null}
-          >
-            {item.dueDate}
-          </span>
-        )}
       </label>
+      <button
+        className={`due-date ${isDueToday ? 'due-today' : ''}`}
+        disabled
+      >
+        {formatDueDate(item.dueDate)}
+      </button>
       <FaTrashAlt
         role="button"
         tabIndex="0"
@@ -46,3 +38,17 @@ const LineItem = ({ item, handleCheck, handleDelete }) => {
 };
 
 export default LineItem;
+
+function getCurrentDate() {
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, '0');
+  const mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+  const yyyy = today.getFullYear();
+
+  return yyyy + '-' + mm + '-' + dd;
+}
+
+function formatDueDate(dueDate) {
+  // Format the due date as needed (e.g., 'yyyy-mm-dd')
+  return dueDate;
+}

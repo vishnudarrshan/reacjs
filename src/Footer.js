@@ -1,11 +1,13 @@
-import React from 'react';
+import React from 'react'
 
-const Footer = ({ length }) => {
+const Footer = ({length}) => {
+
   return (
-    <footer>
-      {length} {length === 1 ? 'Item' : 'Items'}
-    </footer>
-  );
-};
 
-export default Footer;
+      <footer>{length} List Items </footer>
+
+
+  )
+}
+
+export default Footer

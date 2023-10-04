@@ -1,32 +1,27 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { FaPlus } from 'react-icons/fa';
 
-const AddItem = ({ onAdd }) => {
-  const [newItem, setNewItem] = useState('');
-  const [dueDate, setDueDate] = useState(''); // State for due date
+const AddItem = ({ newItem, setNewItem, onAdd }) => {
+  const inputRef = useRef();
+  const [dueDate, setDueDate] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (!newItem.trim()) {
-      return;
-    }
-
-    // Include due date in the item
-    onAdd({ item: newItem, dueDate: dueDate, checked: false });
-
-    // Clear input fields
+    onAdd(newItem, dueDate);
     setNewItem('');
     setDueDate('');
+    inputRef.current.focus();
   };
 
   return (
     <form className="addForm" onSubmit={handleSubmit}>
-      <label htmlFor="addItem">Add Item</label>
+      <label htmlFor="addItem">Add Task</label>
       <input
         autoFocus
+        ref={inputRef}
         id="addItem"
         type="text"
-        placeholder="Add Item"
+        placeholder="Add Task"
         required
         value={newItem}
         onChange={(e) => setNewItem(e.target.value)}
@@ -34,11 +29,12 @@ const AddItem = ({ onAdd }) => {
       <input
         id="dueDate"
         type="date"
+        placeholder="Due Date"
         value={dueDate}
         onChange={(e) => setDueDate(e.target.value)}
       />
       <button type="submit" aria-label="Add Item">
-        Add
+        <FaPlus />
       </button>
     </form>
   );
