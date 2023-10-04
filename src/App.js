@@ -15,7 +15,9 @@ function App() {
   const [search, setSearch] = useState('');
   const [fetchError, setFetchError] = useState(null);
   const [isLoading, setisLoading] = useState(true);
-  const [filterValue, setFilterValue] = useState('all'); 
+  const [filterValue, setFilterValue] = useState('all');
+  const [undoHistory, setUndoHistory] = useState([]); // Store the undo history
+  const [redoHistory, setRedoHistory] = useState([]); // Store the redo history
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -37,6 +39,9 @@ function App() {
   }, []);
 
   const addItem = async (item, dueDate) => {
+    // Store the current state in undo history
+    setUndoHistory([...undoHistory, items]);
+
     const id = items.length ? items[items.length - 1].id + 1 : 1;
     const myNewItem = { id, checked: false, item, dueDate };
     const listItems = [...items, myNewItem];
@@ -55,6 +60,9 @@ function App() {
   };
 
   const handleCheck = async (id) => {
+    // Store the current state in undo history
+    setUndoHistory([...undoHistory, items]);
+
     const listItems = items.map((item) =>
       item.id === id ? { ...item, checked: !item.checked } : item
     );
@@ -76,6 +84,9 @@ function App() {
   };
 
   const handleDelete = async (id) => {
+    // Store the current state in undo history
+    setUndoHistory([...undoHistory, items]);
+
     const listItems = items.filter((item) => item.id !== id);
     setItems(listItems);
 
@@ -87,6 +98,22 @@ function App() {
     if (result) setFetchError(result);
   };
 
+  // Implement undo function
+  const undo = () => {
+    if (undoHistory.length === 0) return; // No history to undo
+    const previousState = undoHistory.pop();
+    setRedoHistory([...redoHistory, items]);
+    setItems(previousState);
+  };
+
+  // Implement redo function
+  const redo = () => {
+    if (redoHistory.length === 0) return; // No history to redo
+    const nextState = redoHistory.pop();
+    setUndoHistory([...undoHistory, items]);
+    setItems(nextState);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!newItem) return;
@@ -94,7 +121,7 @@ function App() {
     setNewItem('');
   };
 
-  const filteredItems = items.filter(item => {
+  const filteredItems = items.filter((item) => {
     if (filterValue === 'completed') {
       return item.checked;
     } else if (filterValue === 'not-completed') {
@@ -103,25 +130,33 @@ function App() {
       return true; // Show all tasks when 'all' is selected
     }
   });
-  
 
   return (
     <div className="App">
       <Header title="To Do List" />
-      <AddItem newItem={newItem} setNewItem={setNewItem} onAdd={addItem} />
-      <SearchItem search={search} setSearch={setSearch} />
-      <FilterDropdown filterValue={filterValue} setFilterValue={setFilterValue} />
+      <AddItem
+        newItem={newItem}
+        setNewItem={setNewItem}
+        onAdd={addItem}
+      />
+      <FilterDropdown
+        filterValue={filterValue}
+        setFilterValue={setFilterValue}
+      />
       <main>
-        {isLoading && <p>Loading items..</p>}
-        {fetchError && <p>`Error: {fetchError}`</p>}
-        {!isLoading && !fetchError && (
+          
           <Content
-          items={filteredItems} // Pass filteredItems to the Content component
-          handleCheck={handleCheck}
-          handleDelete={handleDelete}
-        />
-        )}
+            items={filteredItems}
+            handleCheck={handleCheck}
+            handleDelete={handleDelete}
+          />
       </main>
+      <button onClick={undo}>Undo</button>
+        <button onClick={redo}>Redo</button>
+        {isLoading && <p>Loading items..</p>}
+        {fetchError && <p>Error: {fetchError}</p>}
+        {!isLoading && !fetchError}
+        <br/>
       <Footer length={items.length} />
     </div>
   );
