@@ -5,7 +5,6 @@ import AddItem from './AddItem';
 import SearchItem from './SearchItem';
 import Content from './Content';
 import Footer from './Footer';
-import LineItem from './LineItem';
 import apiRequest from './apiRequest';
 import FilterDropdown from './FilterDropdown';
 

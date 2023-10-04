@@ -1,22 +1,3 @@
 {
-  "items": [
-    {
-      "id": 1,
-      "checked": true,
-      "item": "Java Coding",
-      "dueDate": "2023-10-06"
-    },
-    {
-      "id": 2,
-      "checked": true,
-      "item": "Aptitude Training",
-      "dueDate": "2023-10-13"
-    },
-    {
-      "id": 3,
-      "checked": true,
-      "item": "Pubg",
-      "dueDate": "2023-10-15"
-    }
-  ]
+  "items": []
 }

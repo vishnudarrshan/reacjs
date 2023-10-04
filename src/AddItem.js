@@ -31,6 +31,7 @@ const AddItem = ({ newItem, setNewItem, onAdd }) => {
         type="date"
         placeholder="Due Date"
         value={dueDate}
+        required
         onChange={(e) => setDueDate(e.target.value)}
       />
       <button type="submit" aria-label="Add Item">
