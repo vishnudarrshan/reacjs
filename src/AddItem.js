@@ -1,31 +1,47 @@
-import { FaPlus } from 'react-icons/fa';
-import { useRef } from 'react';
+import React, { useState } from 'react';
 
-const AddItem = ({ newItem, setNewItem, handleSubmit }) => {
-    const inputRef = useRef();
+const AddItem = ({ onAdd }) => {
+  const [newItem, setNewItem] = useState('');
+  const [dueDate, setDueDate] = useState(''); // State for due date
 
-    return (
-        <form className='addForm' onSubmit={handleSubmit}>
-            <label htmlFor='addItem'>Add Item</label>
-            <input
-                autoFocus
-                ref={inputRef}
-                id='addItem'
-                type='text'
-                placeholder='Add Item'
-                required
-                value={newItem}
-                onChange={(e) => setNewItem(e.target.value)}
-            />
-            <button
-                type='submit'
-                aria-label='Add Item'
-                onClick={() => inputRef.current.focus()}
-            >
-                <FaPlus />
-            </button>
-        </form>
-    )
-}
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-export default AddItem
+    if (!newItem.trim()) {
+      return;
+    }
+
+    // Include due date in the item
+    onAdd({ item: newItem, dueDate: dueDate, checked: false });
+
+    // Clear input fields
+    setNewItem('');
+    setDueDate('');
+  };
+
+  return (
+    <form className="addForm" onSubmit={handleSubmit}>
+      <label htmlFor="addItem">Add Item</label>
+      <input
+        autoFocus
+        id="addItem"
+        type="text"
+        placeholder="Add Item"
+        required
+        value={newItem}
+        onChange={(e) => setNewItem(e.target.value)}
+      />
+      <input
+        id="dueDate"
+        type="date"
+        value={dueDate}
+        onChange={(e) => setDueDate(e.target.value)}
+      />
+      <button type="submit" aria-label="Add Item">
+        Add
+      </button>
+    </form>
+  );
+};
+
+export default AddItem;

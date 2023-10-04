@@ -1,24 +1,19 @@
 import React from 'react';
-import LineItem from './LineItem';
+import ItemLists from './ItemLists'; // Update the import path
 
 const Content = ({ items, handleCheck, handleDelete }) => {
   return (
-    <>
+    <main>
       {items.length ? (
-        <ul>
-          {items.map((item) => (
-            <LineItem
-              item={item}
-              key={item.id}
-              handleCheck={handleCheck}
-              handleDelete={handleDelete}
-            />
-          ))}
-        </ul>
+        <ItemLists
+          items={items}
+          handleCheck={handleCheck}
+          handleDelete={handleDelete}
+        />
       ) : (
         <p style={{ marginTop: '2rem' }}>List is Empty</p>
       )}
-    </>
+    </main>
   );
 };
 
