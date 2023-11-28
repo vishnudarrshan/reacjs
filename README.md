@@ -7,7 +7,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 >> Allow users to add task with due dates.
 >> User can delete and update the task.
 >> Undo and Redo Option is Available.
->> Uses the local json server make api calls.
+>> Uses the local json server to make api calls.
 >> User can mark a task either completed or not completed.
 >> User can be able to filter the task status using dropdown box.
 
