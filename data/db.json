@@ -1,20 +1,8 @@
 {
   "items": [
     {
-      "id": 3,
-      "checked": true,
-      "item": "Aps",
-      "dueDate": "2023-10-12"
-    },
-    {
-      "id": 4,
-      "checked": false,
-      "item": "vishnu",
-      "dueDate": "2023-10-18"
-    },
-    {
       "id": 5,
-      "checked": false,
+      "checked": true,
       "item": "Vishnu",
       "dueDate": "2023-10-10"
     }
